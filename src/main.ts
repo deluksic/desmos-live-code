@@ -1,21 +1,15 @@
-import { getCalc } from "./lib/getCalc";
-import { op } from "./lib/operators";
+import { op, point } from "./lib/operators";
+import { runExample } from "./lib/runExample";
 
-const Calc = getCalc();
+function* linesDemo(): Generator<Desmos.ExpressionState> {
+  yield point("P_1", "(0, 0)");
+  yield point("P_2", "(0, 5)");
+  yield {
+    id: "hello-world",
+    type: "expression",
+    latex: op("segment", "P_1", "P_2"),
+    color: "#000000",
+  };
+}
 
-Calc.setExpression({
-  id: 'p1',
-  type: 'expression',
-  latex: 'P_1 = (0, 0)',
-})
-Calc.setExpression({
-  id: 'p2',
-  type: 'expression',
-  latex: 'P_2 = (0, 2)'
-})
-Calc.setExpression({
-  id: 'hello-world',
-  type: 'expression',
-  latex: op('segment', 'P_1', 'P_2'),
-  color: '#000000'
-})
+runExample(linesDemo())
