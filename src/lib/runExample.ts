@@ -1,11 +1,17 @@
 import { isDefined } from "../utils/isDefined";
+import {
+  ExpressionContext,
+  type ExpressionContextType,
+} from "./ExpressionContext";
 import { getCalc } from "./getCalc";
 
-export function runExample(example: Iterable<Desmos.ExpressionState>) {
+export function runExample(example: () => void) {
   const previousExpressions: Desmos.ExpressionState[] =
     (window as any).previousExpressions ?? [];
   const Calc = getCalc();
-  const newExpressions = [...example].map((e, i) => ({
+  const ctx: ExpressionContextType = { expressions: [] };
+  ExpressionContext.provide(ctx, example);
+  const newExpressions = ctx.expressions.map((e, i) => ({
     id: `__live-reload-${i}`,
     ...e,
   }));

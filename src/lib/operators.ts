@@ -1,40 +1,37 @@
+import { appendExpression } from "./ExpressionContext";
+import { nextSymbolIdentifier } from "./NamingContext";
+
 export type ExpressionOpts = Partial<
-  Omit<Desmos.ExpressionState & { type: "expression" }, "type" | "id">
+  Omit<Desmos.ExpressionState & { type: "expression" }, "type">
 >;
 
 export function op(fnName: string, ...args: string[]) {
   return `\\operatorname{${fnName}}\\left(${args.join(",")}\\right)`;
 }
 
-export function point(
-  identifier: string,
-  definitionLatex: string,
-  opts?: ExpressionOpts
-): Desmos.ExpressionState {
-  return {
+export function point(definitionLatex: string, opts?: ExpressionOpts) {
+  const identifier = opts?.id ?? nextSymbolIdentifier("P");
+  appendExpression({
     type: "expression",
     id: `point-${identifier}`,
     label: identifier,
     latex: `${identifier}=${definitionLatex}`,
     showLabel: true,
     ...opts,
-  };
+  });
+  return identifier;
 }
 
-export function vector(
-  identifier: string,
-  a: string,
-  b: string,
-  opts?: ExpressionOpts
-): Desmos.ExpressionState {
+export function vector(a: string, b: string, opts?: ExpressionOpts) {
+  const identifier = opts?.id ?? nextSymbolIdentifier("v");
   const definitionLatex = op("vector", a, b);
-  return {
+  appendExpression({
     type: "expression",
     id: `vector-${identifier}`,
-    latex: identifier ? `${identifier}=${definitionLatex}` : definitionLatex,
-    hidden: true,
+    latex: `${identifier}=${definitionLatex}`,
     ...opts,
-  };
+  });
+  return identifier;
 }
 
 type SliderBounds = (Desmos.ExpressionState & {
@@ -42,19 +39,20 @@ type SliderBounds = (Desmos.ExpressionState & {
 })["sliderBounds"];
 
 export function slider(
-  identifier: string,
   definitionLatex: number | string,
   sliderBounds?: Partial<SliderBounds>,
   opts?: ExpressionOpts
-): Desmos.ExpressionState {
-  return {
+) {
+  const identifier = opts?.id ?? nextSymbolIdentifier("s");
+  appendExpression({
     type: "expression",
     id: `slider-${identifier}`,
     latex: `${identifier}=${definitionLatex}`,
     // @ts-expect-error
     sliderBounds,
     ...opts,
-  };
+  });
+  return identifier;
 }
 
 export function abs(value: string) {
@@ -65,20 +63,24 @@ export function div(a: string | number, b: string | number) {
   return `\\frac{${a}}{${b}}`;
 }
 
-export function expr(
-  identifierOrDefinition: string,
-  latexDefinition?: string,
-  opts?: ExpressionOpts
-): Desmos.ExpressionState {
-  return {
+export function define(latexDefinition?: string, opts?: ExpressionOpts) {
+  const identifier = opts?.id ?? nextSymbolIdentifier();
+  appendExpression({
     type: "expression",
-    id: `expr-${identifierOrDefinition}`,
-    latex: latexDefinition
-      ? `${identifierOrDefinition}=${latexDefinition}`
-      : identifierOrDefinition,
-    hidden: true,
+    id: `expr-${identifier}`,
+    latex: `${identifier}=${latexDefinition}`,
     ...opts,
-  };
+  });
+  return identifier;
+}
+
+export function expr(latexDefinition: string, opts?: ExpressionOpts) {
+  appendExpression({
+    type: "expression",
+    id: `expr-${latexDefinition}`,
+    latex: latexDefinition,
+    ...opts,
+  });
 }
 
 export function neg(value: string | number) {

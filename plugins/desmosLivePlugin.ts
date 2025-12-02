@@ -9,14 +9,14 @@ export type DesmosLivePluginOptions = {
 
 export function desmosLivePlugin({
   target = "calculator",
-  expressionsCollapsedByDefault=false,
+  expressionsCollapsedByDefault = false,
 }: DesmosLivePluginOptions = {}): PluginOption {
+  let latestCode: string | undefined = undefined;
   // Browser + page promise
   const browserReady = (async () => {
     const browser: Browser = await chromium.launch({ headless: false });
     const page: Page = await browser.newPage({ viewport: null });
 
-    page.on("console", (msg) => console.log("BROWSER:", msg.text()));
     browser.on("disconnected", () => {
       console.log("Browser closed, exiting.");
       process.exit(0);
@@ -28,12 +28,18 @@ export function desmosLivePlugin({
     await page.waitForSelector(".dcg-container");
     await page.waitForFunction(() => (window as any).Calc !== undefined);
     if (expressionsCollapsedByDefault) {
-        await page.evaluate(()=>{
-            (window as any).Calc.updateSettings({
-                expressionsCollapsed: true
-            })
-        })
+      await page.evaluate(() => {
+        (window as any).Calc.updateSettings({
+          expressionsCollapsed: true,
+        });
+      });
     }
+
+    page.on("load", async () => {
+      if (latestCode) {
+        await page.evaluate(latestCode);
+      }
+    });
 
     console.log("✅ Desmos ready in browser");
 
@@ -55,6 +61,7 @@ export function desmosLivePlugin({
         if (chunk.type === "chunk") {
           try {
             await page.evaluate(chunk.code);
+            latestCode = chunk.code;
             console.log(`Injected ${fileName} into Desmos`);
           } catch (err) {
             console.error(`Failed to inject ${fileName}:`, err);
