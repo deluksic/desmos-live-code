@@ -52,10 +52,10 @@ function linesDemo() {
   const rB = slider(2, { min: 0, max: 5 }, { id: "r_b" });
   const rC = slider(1, { min: 0, max: 5 }, { id: "r_c" });
   const rD = slider(1, { min: 0, max: 5 }, { id: "r_d" });
-  const A = point("(0, 0)", { id: "A" });
-  const B = point("(2, 0)", { id: "B" });
-  const C = point("(4, 0)", { id: "C" });
-  const D = point("(6, 0)", { id: "D" });
+  const A = point(0, 0, { id: "A" });
+  const B = point(2, 0, { id: "B" });
+  const C = point(4, 0, { id: "C" });
+  const D = point(6, 0, { id: "D" });
   applyState(guideLineStyle, () => {
     expr(op("circle", A, rA));
     expr(op("circle", B, rB));

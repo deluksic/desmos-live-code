@@ -9,13 +9,17 @@ export function op(fnName: string, ...args: string[]) {
   return `\\operatorname{${fnName}}\\left(${args.join(",")}\\right)`;
 }
 
-export function point(definitionLatex: string, opts?: ExpressionOpts) {
+export function point(
+  x: string | number,
+  y: string | number,
+  opts?: ExpressionOpts
+) {
   const identifier = opts?.id ?? nextSymbolIdentifier("P");
   appendExpression({
     type: "expression",
     id: `point-${identifier}`,
     label: identifier,
-    latex: `${identifier}=${definitionLatex}`,
+    latex: `${identifier}=\\left(${x},${y}\\right)`,
     showLabel: true,
     ...opts,
   });
